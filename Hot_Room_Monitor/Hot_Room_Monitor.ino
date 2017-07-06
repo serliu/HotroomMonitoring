@@ -99,7 +99,7 @@ void setup(){
   getTemps(temps);
   Serial.println("Initial Temperatures: " + (String) temps[0] + " " + (String) temps[1]);
   //set filename upon restart
-  file_name = "data/" + twoDigitString(tm.Month) + "-" + twoDigitString(tm.Day) + "-" + ((String)tmYearToCalendar(tm.Year)).substring(2) + ".CSV";
+  file_name = "data/" + ((String)tmYearToCalendar(tm.Year)).substring(2) + "-" + twoDigitString(tm.Month) + "-" + twoDigitString(tm.Day) + ".CSV";
 }
 
 void loop(){
@@ -125,7 +125,7 @@ void loop(){
     //if number of days to make a new log has occured, make a new log
     if(EEPROM.read(ADDR_COUNT) >= DAYS_BETWEEN_NEW_LOG){
       EEPROM.write(ADDR_COUNT, 0); //reset count
-      file_name = "data/" + twoDigitString(tm.Month) + "-" + twoDigitString(tm.Day) + "-" + ((String)tmYearToCalendar(tm.Year)).substring(2) + ".CSV";
+      file_name = "data/" + ((String)tmYearToCalendar(tm.Year)).substring(2) + "-" + twoDigitString(tm.Month) + "-" + twoDigitString(tm.Day) + ".CSV";
     }
     
     getTemps(temps);
@@ -220,7 +220,7 @@ void loop(){
           //formatting into json
           client.print("{");
           client.print("\"date\": ");
-          client.print("\"" +twoDigitString(tm.Month - 1) + '-' + twoDigitString(tm.Day) + '-' + (String)tmYearToCalendar(tm.Year) +  ' ' + twoDigitString(tm.Hour) + ':' + twoDigitString(tm.Minute) + ':' + twoDigitString(tm.Second)+"\"");
+          client.print("\"" +twoDigitString(tm.Month) + '-' + twoDigitString(tm.Day) + '-' + (String)tmYearToCalendar(tm.Year) +  ' ' + twoDigitString(tm.Hour) + ':' + twoDigitString(tm.Minute) + ':' + twoDigitString(tm.Second)+"\"");
           client.print(",");
           for(int i=0; i<2; i++){
             client.print("\"S");
@@ -233,14 +233,13 @@ void loop(){
           }
           client.println("}");
 //          client.stop();
-          Serial.println("Client closed");
           break;
         } else if (strstr(clientline, "GET /history")!=0){ //url for iframe in main app
           // send a standard http response header
           HtmlHeaderOK(client);
           client.println(F(""));
           client.print(F("<!DOCTYPE html><style> body{font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif; color:#fff; height: 100%; background: #3498db; color #545454; margin: 0 auto; max-width: 100%; padding: 2em 2em 4em;} a:link{ text-decoration:none; font-weight: bold;color:#fff;}a:visited {text-decoration:none;font-weight:bold;color:#ddd;}a:hover{text-decoration:  underline;font-weight:bold;color:#fff;}"));
-          client.print(F("a:active{text-decoration:underline;font-weight:bold;color: white;} ul{columns: 4; list-style: none;}li {list-style-type: none;font-size: 18px;} </style><html><body>"));
+          client.print(F("a:active{text-decoration:underline;font-weight:bold;color: white;}th{font-weight: bold;}th,td {padding: 3px;color: #fff;text-align: center;border: 0px none;} table{color: #fff;border: 1px solid #ddd;border-collapse: collapse;width: 100%;table-layout: fixed;}</style><html><body>"));
           ListFiles(client);
           client.print(F("</body></html>"));
 
@@ -395,26 +394,38 @@ void sdLog(String fileName, String stringToWrite) {
 void ListFiles(EthernetClient client) {
 
   File workingDir = SD.open("/data/");
-  
-  client.println("<ul>");
-  
+  int filecount = 0;
+  client.print("<table><tr>");
     while(true) {
       File entry =  workingDir.openNextFile();
       if (! entry) {
         break;
       }
-      client.print("<li><a href=\"/HC.htm?file=");
+      filecount++;
+      if (filecount % 5 == 0){
+        client.print("</tr><tr>");
+      }
+      client.print("<td><a href=\"/HC.htm?file=");
       client.print(entry.name());
       client.print("\">");
       client.print(entry.name());
-      client.println("</a></li>");
+      client.println("</a></td>");
       entry.close();
     }
-  client.println("</ul>");
+  client.println("</tr></table>");
+  //Serial.println("Number of files: " + (String) filecount);
+  if(filecount > 29){
+    removeOldestLog();
+  }
   workingDir.close();
 }
 
-
+void removeOldestLog(){
+  File workingDir = SD.open("/data/");
+  File entry = workingDir.openNextFile();
+  SD.remove("/data/" + (String) entry.name());
+  Serial.println("Oldest Log Removed");
+}
 
 void getTemps(float *temps) {
   temps[0] = tempsensor0.readTempC();
