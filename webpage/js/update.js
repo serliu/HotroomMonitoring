@@ -1,7 +1,10 @@
 var chart;
 var chart_interval, table_interval, ip_interval;
-var upper_thresh = 28.00;
-var lower_thresh = 18.00;
+var upper_thresh = 50.00;
+var lower_thresh = 10.00;
+var chart_refresh_time = 180000; //3 minutes
+var live_table_refresh_time = 3000; //3 seconds
+var ip_refresh_time = 900000; //15 minutes
 function update_chart_table() {
     $.ajax({
         url: "http://30.30.30.90/json",
@@ -25,6 +28,10 @@ function update_chart_table() {
                 shift1 = series1.data.length > 500;
             chart.series[0].addPoint(point0, true, shift0);
             chart.series[1].addPoint(point1, true, shift1);
+            if (chart.series[0].data.length > 3360){ //one week divided by 3 minutes
+                chart.series[0].removePoint(0, true);
+                chart.series[1].removePoint(0, true);
+            }
             update_table();
         },
         cache: false
@@ -35,7 +42,7 @@ function update_table() {
         url: "http://30.30.30.90/json",
         data: { tag: 'GetDataFromArduino'},
         dataType: "json",
-        timeout: 10000,
+        timeout: 5000,
         success: function(data){
             document.getElementById('sensor0').innerHTML = data.S0 + '&deg;C';
             document.getElementById('sensor1').innerHTML = data.S1 + '&deg;C';
@@ -93,12 +100,12 @@ function display_iplist(){
 function start_running(){
     document.getElementById("s_button").innerHTML = "Stop Updating";
     document.getElementById("s_button").style.backgroundColor = "#e33100";
-    document.getElementById("s_button").setAttribute('onClick', 'stop_running();')
-    update_chart_table()
-    chart_interval = setInterval(update_chart_table, 60000);
-    table_interval = setInterval(update_table, 10000);
+    document.getElementById("s_button").setAttribute('onClick', 'stop_running();');
+    update_chart_table();
+    chart_interval = setInterval(update_chart_table, chart_refresh_time);
+    table_interval = setInterval(update_table, live_table_refresh_time);
     get_ip_list();
-    setInterval(get_ip_list, 10000);
+    setInterval(get_ip_list, ip_refresh_time);
 }
 
 function stop_running(){

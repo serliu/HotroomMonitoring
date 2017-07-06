@@ -60,6 +60,7 @@ String file_name;
 int filenum;
 tmElements_t tm;
 unsigned long lastIntervalTime = 0;
+unsigned long lastResetTime = 0;
 long measure_interval = MEASURE_INTERVAL_NORMAL; //Time between measurements
 //<------------------------------------------------>
 
@@ -103,8 +104,12 @@ void setup(){
 }
 
 void loop(){
-
-
+  if((millis()%lastResetTime >= 18000000)){ //reset ethernet every 5 hours for stability
+      Ethernet.begin(mac, ip, gateway, gateway, subnet);
+      server.begin();
+      Serial.println("Server reset @ " + (String) Ethernet.localIP());
+      lastResetTime = millis();
+  }
   //Check if its time to take a new measurement
   if((millis()%lastIntervalTime) >= measure_interval){ //if its time, get new measuremnt and record it
     
@@ -242,7 +247,7 @@ void loop(){
           client.print(F("a:active{text-decoration:underline;font-weight:bold;color: white;}th{font-weight: bold;}th,td {padding: 3px;color: #fff;text-align: center;border: 0px none;} table{color: #fff;border: 1px solid #ddd;border-collapse: collapse;width: 100%;table-layout: fixed;}</style><html><body>"));
           ListFiles(client);
           client.print(F("</body></html>"));
-
+          
           
         }else if (strstr(clientline, "GET /") != 0) {
           // this time no space after the /, so a sub-file!
