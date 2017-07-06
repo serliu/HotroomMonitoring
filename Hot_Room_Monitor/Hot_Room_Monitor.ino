@@ -36,13 +36,12 @@
 #define LOWER_GAS_THRESH 100
 #define MEASURE_INTERVAL_NORMAL 30000
 #define MEASURE_INTERVAL_EMERGENCY
-#define DAYS_BETWEEN_NEW_LOG 1
+#define DAYS_BETWEEN_NEW_LOG 1 //how often to make a new log
 #define ADDR_COUNT 1 //address for where day count will be stored in EEPROM
 #define ADDR_DAY 0 //address for where day number " "
 #define HIGH_FREQ 700
 #define LOW_FREQ 200
 //<------------------------------------------------>
-
 
 
 //<-----------------IP SETTINGS-------------------->
@@ -51,13 +50,9 @@ IPAddress ip(30,30,30,90);
 IPAddress gateway(30,30,30,254);
 IPAddress subnet(255, 255, 255, 0);
 EthernetServer server(80);
-//char smtpserver[] = "mail.smtp2go.com";
-IPAddress smtpserver (207,58,142,213); //equivalent but supposed to work better
 int port = 80; //only open port on this network
 EthernetClient client;
-char callback[16] = "arduinoCallback";
 //<---------------END IP SETTINGS------------------>
-
 
 
 //<------------------LOGGING VARIABLES--------------------->
@@ -73,16 +68,7 @@ long measure_interval = MEASURE_INTERVAL_NORMAL; //Time between measurements
 // Create the MCP9808 temperature sensor object
 Adafruit_MCP9808 tempsensor0 = Adafruit_MCP9808();
 Adafruit_MCP9808 tempsensor1 = Adafruit_MCP9808();
-String blank  = "";
-String tab = "     ";
-//const int buzzerPin0 = 15;
-//const int buzzerPin1 = 16;
-//const int buzzerPin2 = 17;
-//const int buzzerPin3 = 18;
-//const int doorPin0 = 3;
-//const int doorPin1 = 7; 
-//const int doorPin2 = 5;
-//const int doorPin3 = 6;
+
 bool *doors = (bool*) malloc (4 * sizeof(bool));
 float *temps = (float*) malloc (4* sizeof(float));
 bool emergency_mode = false;
@@ -90,42 +76,10 @@ bool emergency_mode = false;
 
 
 
-
-//<-------------------FUNCTIONS-------------------->
-//void playSound(int cNum, int frequency)
-//void getTemps(float temps*)
-//void initialize_ethernet()
-//void initialize_sd(void);
-//void initialize_tempsensor(void)
-//void checkDoors(bool *doors)
-//void sdLog(File filename, String message)
-//<------------------------------------------------>
-
-
-
-
 void setup(){
 
   //Start Serial monitoring
   Serial.begin(9600);
-
-  //Begin Pins
-  //Buzzer Pins 0-3
-//  pinMode(buzzerPin0, OUTPUT);
-//  pinMode(buzzerPin1, OUTPUT);
-//  pinMode(buzzerPin2, OUTPUT);
-//  pinMode(buzzerPin3, OUTPUT);
-//
-//  //Door pins 0-3, set them closed by default(high)
-//  pinMode(doorPin0, INPUT_PULLUP); 
-//  digitalWrite(doorPin0, HIGH);
-//  pinMode(doorPin1, INPUT_PULLUP); 
-//  digitalWrite(doorPin1, HIGH);
-//  pinMode(doorPin2, INPUT_PULLUP); 
-//  digitalWrite(doorPin2, HIGH);
-//  pinMode(doorPin3, INPUT_PULLUP); 
-//  digitalWrite(doorPin3, HIGH);
-
   
   //Start SD card
   initialize_sd();
@@ -149,8 +103,7 @@ void setup(){
 }
 
 void loop(){
-  //Buzz if any door is open, play corresponding sound
-//  checkDoors(doors);
+
 
   //Check if its time to take a new measurement
   if((millis()%lastIntervalTime) >= measure_interval){ //if its time, get new measuremnt and record it
@@ -256,7 +209,7 @@ void loop(){
           ListFiles(client);
           client.print(F("</body></html>"));
         }
-        else if (strstr(clientline, "GET /json")!=0){
+        else if (strstr(clientline, "GET /json")!=0){ //used for live update data
           client.println(F("HTTP/1.1 200 OK"));
           client.println("Access-Control-Allow-Origin: *");
           client.println(F("Content-Type: application/json;charset=utf-8"));
