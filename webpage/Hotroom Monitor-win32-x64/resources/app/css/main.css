@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css?family=Audiowide');
+html{
+    height:100%;
+}
+.green{
+    background: limegreen;
+}
+.red{
+    background: red;
+}
+th{
+    font-weight: bold;
+}
+th,td {
+    padding: 3px;
+    color: #fff; 
+    text-align: center;
+    border: 0px none;
+} 
+table{
+    color: #fff;
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+h1 {
+    font-family: 'Audiowide';
+      font-size: 42px;
+      color: #fff;
+} 
+h2{
+    color: #fff;
+    font-size: 32px;
+}
+#coops{
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    font-size: 10px;
+}
+a{
+  /* Applies to all unvisited links */
+  text-decoration:  none;
+  font-weight:      bold;
+  color:            #fff;
+}
+a:hover{
+    color: #ddd;
+}
+html {
+    background: #ddd;
+    height: 100%;
+} 
+ul{
+    columns: 5;
+}
+iframe{
+    width: 100%;
+    height: 400px;
+    border: none;
+    overflow: hidden;
+}
+body {
+    color: #fff; 
+    height: 100%;
+    background: #3498db; 
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.06);
+    color: #545454; 
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    text-align: center;
+    line-height: 1.5;
+    margin: 0 auto;
+    max-width: 100%;
+    padding: 2em 2em 4em;
+/*            overflow:hidden;*/
+}
+::-webkit-scrollbar { 
+    display: none; 
+}
+li { 
+    list-style-type: none;
+    font-size: 18px;
+    font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;
+} 
+#s_button{
+    background: none;
+    padding: 5px 10px 6px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    line-height: 1;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-box-shadow: 0 1px 3px #999;
+    -webkit-box-shadow: 0 1px 3px #999;
+    border-bottom: 1px solid #222;
+    position: relative;
+    cursor: pointer;
+    -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+    border-bottom: 1px solid rgba(0,0,0,0.25);
+    background-color: #e33100;
+}

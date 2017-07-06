@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+    <style> 
+        html{
+            height:100%;
+        }
+        .green{
+            background: limegreen;
+        }
+        .red{
+            background: red;
+        }
+        th{
+            font-weight: bold;
+        }
+        th,td {
+            padding: 3px;
+            color: #fff; 
+            text-align: center;
+            border: 0px none;
+        } 
+        table{
+            color: #fff;
+            border: 1px solid #ddd;
+            border-collapse: collapse;
+            width: 100%;
+            table-layout: fixed;
+        }
+        h1 {
+              font-size: 42px;
+              color: #fff;
+        } 
+        h2{
+            color: #fff;
+            font-size: 32px;
+        }
+        a{
+          /* Applies to all unvisited links */
+          text-decoration:  none;
+          font-weight:      bold;
+          color:            #fff;
+        }
+        html {
+            background: #ddd;
+            height: 100%;
+        } 
+        ul{
+            columns: 5;
+        }
+        iframe{
+            width: 100%;
+            height: 400px;
+            border: none;
+            overflow: hidden;
+        }
+        body {
+            color: #fff; 
+            height: 100%;
+            background: #3498db; 
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.06);
+            color: #545454; 
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            text-align: center;
+            line-height: 1.5;
+            margin: 0 auto;
+            max-width: 100%;
+            padding: 2em 2em 4em;
+/*            overflow:hidden;*/
+        }
+        ::-webkit-scrollbar { 
+            display: none; 
+        }
+        li { 
+            list-style-type: none;
+            font-size: 18px;
+            font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;
+        } 
+        #s_button{
+            background: none;
+            padding: 5px 10px 6px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            line-height: 1;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            -moz-box-shadow: 0 1px 3px #999;
+            -webkit-box-shadow: 0 1px 3px #999;
+            border-bottom: 1px solid #222;
+            position: relative;
+            cursor: pointer;
+            -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+            border-bottom: 1px solid rgba(0,0,0,0.25);
+            background-color: #e33100;
+        }
+    </style>
+    <head>
+        <title>Arduino Battery Lab Monitor</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Arduino Data History!</title>
+<!--        <script type="text/javascript" src="date.js"></script>-->
+        <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js"
+		integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+		crossorigin="anonymous"></script>
+<!--        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
+        <script type="text/javascript">
+var chart;
+var chart_interval, table_interval, ip_interval;
+var upper_thresh = 28.00;
+var lower_thresh = 18.00;
+function update_chart_table() {
+//    $.getJSON("http://30.30.30.90/json", window.arduinoCallback);
+    $.ajax({
+        url: "http://30.30.30.90/json",
+        data: { tag: 'GetDataFromArduino'},
+        dataType: "json",
+        timeout: 10000,
+        success: function(data){
+//            console.log(data.date, data.S0, data.S1);
+            var datetime = data.date; //"date time"
+            datetime = datetime.split(" "); //[date, time]
+            var date = datetime[0].split("-");
+            var time = datetime[1].split(":");
+            datetime = Date.UTC(date[2], date[0] - 1, date[1], time[0], time[1], time[2]);
+            //console.log("UTC TIME: ", datetime);
+            var point0 = [datetime, data.S0];
+            var point1 = [datetime, data.S1];
+//            console.log(point0, point1);
+            var series0 = chart.series[0],
+                shift0 = series0.data.length > 500;
+            var series1 = chart.series[1],
+                shift1 = series1.data.length > 500;
+            chart.series[0].addPoint(point0, true, shift0);
+            chart.series[1].addPoint(point1, true, shift1);
+            update_table();
+        },
+        cache: false
+    })
+};
+function update_table() {
+    $.ajax({
+        url: "http://30.30.30.90/json",
+        data: { tag: 'GetDataFromArduino'},
+        dataType: "json",
+        timeout: 10000,
+        success: function(data){
+            document.getElementById('sensor0').innerHTML = data.S0 + '&deg;C';
+            document.getElementById('sensor1').innerHTML = data.S1 + '&deg;C';
+            if (data.S0 > upper_thresh) document.getElementById('sensor0').setAttribute('class','red');
+            else document.getElementById('sensor0').setAttribute('class','green');
+            if (data.S1 > upper_thresh) document.getElementById('sensor1').setAttribute('class','red');
+            else document.getElementById('sensor1').setAttribute('class','green');
+        },
+        cache: false
+    })
+};
+
+var all_ips = [], bad_ips = [];
+function get_ip_list(){
+    $.get('iplist.txt', function(data){
+        all_ips = [];
+        all_ips = data.split(/\n/g);
+    });
+    $.get('badips.txt', function(data){
+        bad_ips = [];
+        bad_ips = data.split(/\n/g);
+    });
+    display_iplist();
+}
+            
+function display_iplist(){
+    //BAD IP TXT FILE NEEDS NEW LINE AT THE END OR LAST ONE WILL NOT WORK CORRECTLY
+    //console.log(all_ips, bad_ips);
+    var iptable = "<table><tr>";
+    var isbad = false;
+    for (var i = 0; i < all_ips.length; i++){
+        if ( i % 4 == 0){
+            iptable += "</tr><tr>";
+        }
+        for (var j = 0; j < bad_ips.length; j++){
+            //console.log(all_ips[i], "compared to: ", bad_ips[j]);
+            if (all_ips[i].localeCompare(bad_ips[j]) == 0){
+                isbad = true;
+                break;
+            }
+        }
+        if(isbad){
+            iptable += "<td class=\"red\">" + all_ips[i]+ "</td>";
+        } else{
+            iptable += "<td class=\"green\">" + all_ips[i]+ "</td>";
+        }
+        isbad = false;
+    }
+    iptable += "</tr><table>"
+    //console.log(iptable);
+    document.getElementById('iptable').innerHTML = iptable;
+}
+            
+            
+function start_running(){
+    document.getElementById("s_button").innerHTML = "Stop Updating";
+    document.getElementById("s_button").style.backgroundColor = "#e33100";
+    document.getElementById("s_button").setAttribute('onClick', 'stop_running();')
+    update_chart_table()
+    chart_interval = setInterval(update_chart_table, 60000);
+    table_interval = setInterval(update_table, 10000);
+    get_ip_list();
+    setInterval(get_ip_list, 10000);
+}
+
+function stop_running(){
+    clearInterval(chart_interval);
+    clearInterval(table_interval);
+    clearInterval(ip_interval);
+    document.getElementById("s_button").innerHTML = "Resume Updating";
+    document.getElementById("s_button").style.backgroundColor = "blue";
+    document.getElementById("s_button").setAttribute('onClick', 'start_running();')
+    
+}
+
+$(document).ready(function() {
+    // define the options
+    var options = {
+        global: {
+            useUTC: true
+        },
+        chart: {
+            renderTo: 'container',
+            zoomType: 'xy',
+            spacingRight: 20
+        },
+
+        title: {
+            text: 'Temperature Values Recorded by Arduino'
+        },
+
+        subtitle: {
+            text: 'Click and drag in the plot area to zoom in'
+        },
+
+        xAxis: {
+            type: 'datetime',
+            maxZoom: 2 * 3600000,
+            max: null
+        },
+
+        yAxis: {
+            title: {
+                text: 'Temperature (Celcius)'
+            },
+            min: 0,
+            startOnTick: false,
+            showFirstLabel: false,
+            max: null
+        },
+
+        legend: {
+            enabled: true
+        },
+
+        tooltip: {
+            formatter: function() {
+                    return '<b>'+ this.series.name +'</b><br/>'+
+                    Highcharts.dateFormat('%H:%M - %b %e, %Y', this.x) +': '+ this.y;
+            }
+        },
+
+        plotOptions: {
+            series: {
+                cursor: 'pointer',
+                lineWidth: 1.0,
+                point: {
+                    events: {
+                        click: function() {
+                            hs.htmlExpand(null, {
+                                pageOrigin: {
+                                    x: this.pageX,
+                                    y: this.pageY
+                                },
+                                headingText: this.series.name,
+                                maincontentText: Highcharts.dateFormat('%H:%M - %b %e, %Y', this.x) +':<br/> '+
+                                    this.y,
+                                width: 200
+                            });
+                        }
+                    }
+                },
+            }
+        },
+
+        series: [{
+            name: 'Sensor 1',
+            marker: {
+                radius: 2
+            },
+            data: []
+        },
+        {
+            name: 'Sensor 2',
+            marker: {
+                radius: 2
+            },
+            data: []
+        }]
+    };
+
+    chart = new Highcharts.Chart(options);
+    chart = new Highcharts.Chart(options);
+    start_running();
+
+});
+    
+        </script>
+    </head>
+    <body>
+        <h1>Hot Room Monitor</h1>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/5.0.6/highcharts.js"></script>
+
+        <!-- Additional files for the Highslide popup effect -->
+        <script type="text/javascript" src="http://www.highcharts.com/highslide/highslide-full.min.js"></script>
+        <script type="text/javascript" src="http://www.highcharts.com/highslide/highslide.config.js" charset="utf-8"></script>
+        <script>if (window.module) module = window.module;</script>
+
+        <link rel="stylesheet" type="text/css" href="http://www.highcharts.com/highslide/highslide.css" />
+        
+        <table>
+            <tr>
+                <th>Sensor 1:</th>
+                <td id="sensor0"></td>
+                <th>Sensor 2:</th>
+                <td id="sensor1"></td>
+            </tr>
+        </table>
+        <br/>
+        <table style="padding: 0px;">
+            <tr>
+                <th>Live Temperature</th>
+                <th>Temperature Logs</th>
+            </tr>
+            <tr>
+                <td>
+                    <div id="container" style="min-width: 400px; width: 100%; margin: 0 auto; height: 40%;"></div>
+                </td>        
+                    
+                <td>
+                    <iframe src ="http://30.30.30.90/history" allowfullscreen></iframe>
+                </td>
+            </tr>
+        </table>
+<!--        <a href="http://30.30.30.90" target="_blank">Arduino Log History</a>-->
+        <br />
+        <div id="iptable"></div>
+        <br />
+        <button id="s_button" onclick="stop_running();">Stop Updating</button>
+
+    </body>
+</html>
+              

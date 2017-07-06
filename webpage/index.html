@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>        
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Arduino Battery Lab Monitor</title>
+        <link rel="stylesheet" href="css/main.css"/>
+        <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+        <script type="text/javascript" src="js/jquery-3.2.1.min.js"></script>
+        <script type="text/javascript" src="js/update.js"></script>
+        <script type="text/javascript" src ="js/highcharts.js"></script>
+        <script>if (window.module) module = window.module;</script>
+    </head>
+    
+    
+    <body>
+        <h1>Hot Room Monitor <span id="coops">by the COOPs</span></h1>
+        <table>
+            <tr>
+                <th>Sensor 1:</th>
+                <td id="sensor0"></td>
+                <th>Sensor 2:</th>
+                <td id="sensor1"></td>
+            </tr>
+        </table>
+        <br/>
+        <table style="padding: 0px;">
+            <tr>
+                <th>Live Temperature</th>
+                <th><a href="#" onclick="var ifr=document.getElementsByName('arduino_history')[0]; ifr.src=ifr.src;" >Temperature Logs ↺</a></th>
+            </tr>
+            <tr>
+                <td>
+                    <div id="container" style="min-width: 400px; width: 100%; margin: 0 auto; height: 40%;"></div>
+                </td>        
+                    
+                <td>
+                    <iframe name="arduino_history" src ="http://30.30.30.90/history" allowfullscreen></iframe>
+                </td>
+            </tr>
+        </table>
+<!--        <a href="http://30.30.30.90" target="_blank">Arduino Log History</a>-->
+        <br />
+        <div id="iptable"></div>
+        <br />
+        <button id="s_button" onclick="stop_running();">Stop Updating</button>
+
+    </body>
+</html>
+              

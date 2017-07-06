@@ -1,0 +1,10 @@
+{
+  "name" : "Hotroom_Monitor",
+  "productName" : "Hotroom Monitor",
+  "description": "Temperature and IP Monitor for Hotroom",
+  "version" : "0.1.0",
+  "main" : "main.js",
+  "devDependencies": {
+    "electron" : "^1.6.11"
+  }
+}
