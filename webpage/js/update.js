@@ -140,8 +140,8 @@ $(document).ready(function() {
 
         xAxis: {
             type: 'datetime',
-            maxZoom: 2 * 3600000,
-            max: null
+            maxRange: 7* 24 * 3600000,
+            minRange: 3600000/4
         },
 
         yAxis: {
