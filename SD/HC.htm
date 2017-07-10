@@ -6,6 +6,7 @@
         <script src="https://code.jquery.com/jquery-3.1.1.min.js"
 		integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
 		crossorigin="anonymous"></script>
+<!--        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
         <script type="text/javascript">
 function getDataFilename(str){
     point = str.lastIndexOf("file=")+4;
@@ -71,22 +72,6 @@ $(function () {
                 series: {
                     cursor: 'pointer',
                     lineWidth: 1.0,
-                    point: {
-                        events: {
-                            click: function() {
-                                hs.htmlExpand(null, {
-                                    pageOrigin: {
-                                        x: this.pageX,
-                                        y: this.pageY
-                                    },
-                                    headingText: this.series.name,
-                                    maincontentText: Highcharts.dateFormat('%H:%M - %b %e, %Y', this.x) +':<br/> '+
-                                        this.y,
-                                    width: 200
-                                });
-                            }
-                        }
-                    },
                 }
             },
     
@@ -155,7 +140,6 @@ $(function () {
     <style> body{background: #3498db; overflow-x: hidden;} a{color: #fff; text-decoration: none; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: bold;} a:hover{color: #ddd; text-decoration: underline;}</style>
     <body>
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/5.0.6/highcharts.js"></script>
         <div id="container" style="min-width: 400px; width: 100%; margin: 0 auto"></div>
         
          <center><a id="link1" href="" download>Click Here to Download this Log</a></center>

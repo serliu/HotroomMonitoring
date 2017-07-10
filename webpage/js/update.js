@@ -56,14 +56,15 @@ function update_table() {
 };
 
 var all_ips = [], bad_ips = [];
+
 function get_ip_list(){
     $.get('iplist.txt', function(data){
         all_ips = [];
-        all_ips = data.split(/\n/g);
+        all_ips = data.split("\n");
     });
     $.get('badips.txt', function(data){
         bad_ips = [];
-        bad_ips = data.split(/\n/g);
+        bad_ips = data.split("\n");
     });
     display_iplist();
 }
@@ -71,14 +72,16 @@ function get_ip_list(){
 function display_iplist(){
     //BAD IP TXT FILE NEEDS NEW LINE AT THE END OR LAST ONE WILL NOT WORK CORRECTLY
     //console.log(all_ips, bad_ips);
+//    console.log(all_ips)
     var iptable = "<table><tr>";
     var isbad = false;
     for (var i = 0; i < all_ips.length; i++){
+
         if ( i % 4 == 0){
             iptable += "</tr><tr>";
         }
         for (var j = 0; j < bad_ips.length; j++){
-            //console.log(all_ips[i], "compared to: ", bad_ips[j]);
+//            console.log(all_ips[i], "compared to: ", bad_ips[j]);
             if (all_ips[i].localeCompare(bad_ips[j]) == 0){
                 isbad = true;
                 break;
@@ -102,10 +105,16 @@ function start_running(){
     document.getElementById("s_button").style.backgroundColor = "#e33100";
     document.getElementById("s_button").setAttribute('onClick', 'stop_running();');
     update_chart_table();
+    display_iplist();
     chart_interval = setInterval(update_chart_table, chart_refresh_time);
     table_interval = setInterval(update_table, live_table_refresh_time);
-    get_ip_list();
     setInterval(get_ip_list, ip_refresh_time);
+    get_ip_list();
+
+}
+
+window.onload = function (){
+    get_ip_list();
 }
 
 function stop_running(){
