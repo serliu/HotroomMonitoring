@@ -169,22 +169,6 @@ $(document).ready(function() {
             series: {
                 cursor: 'pointer',
                 lineWidth: 1.0,
-                point: {
-                    events: {
-                        click: function() {
-                            hs.htmlExpand(null, {
-                                pageOrigin: {
-                                    x: this.pageX,
-                                    y: this.pageY
-                                },
-                                headingText: this.series.name,
-                                maincontentText: Highcharts.dateFormat('%H:%M - %b %e, %Y', this.x) +':<br/> '+
-                                    this.y,
-                                width: 200
-                            });
-                        }
-                    }
-                },
             }
         },
 

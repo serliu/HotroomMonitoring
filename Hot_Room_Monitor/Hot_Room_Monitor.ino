@@ -244,7 +244,7 @@ void loop(){
           HtmlHeaderOK(client);
           client.println(F(""));
           client.print(F("<!DOCTYPE html><style> body{font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif; color:#fff; height: 100%; background: #3498db; color #545454; margin: 0 auto; max-width: 100%; padding: 2em 2em 4em;} a:link{ text-decoration:none; font-weight: bold;color:#fff;}a:visited {text-decoration:none;font-weight:bold;color:#ddd;}a:hover{text-decoration:  underline;font-weight:bold;color:#fff;}"));
-          client.print(F("a:active{text-decoration:underline;font-weight:bold;color: white;}th{font-weight: bold;}th,td {padding: 3px;color: #fff;text-align: center;border: 0px none;} table{color: #fff;border: 1px solid #ddd;border-collapse: collapse;width: 100%;table-layout: fixed;}</style><html><body>"));
+          client.print(F("a:active{text-decoration:underline;font-weight:bold;color: white;}th{font-weight: bold;}th,td {padding: 3px;color: #fff;text-align: center;border: 1px solid #ddd;} table{color: #fff;border-collapse: collapse; border: 1px solid #ddd;width: 100%;table-layout: fixed;}</style><html><body>"));
           ListFiles(client);
           client.print(F("</body></html>"));
           
