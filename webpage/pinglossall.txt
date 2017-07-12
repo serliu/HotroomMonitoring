@@ -76,3 +76,7 @@ Failed IP----Date---------Time
 30.30.30.43 Mon 07/10/2017 17:04:02.01 FAIL  
 30.30.30.35 Mon 07/10/2017 17:04:10.02 FAIL  
 30.30.30.23 Mon 07/10/2017 17:04:18.02 FAIL  
+New Test 2 
+Failed IP----Date---------Time 
+New Test 0 
+Failed IP----Date---------Time 

@@ -7,6 +7,7 @@
 		integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
 		crossorigin="anonymous"></script>
 <!--        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
+        <script type="text/javascript" src="http://code.highcharts.com/highcharts.js"></script>
         <script type="text/javascript">
 function getDataFilename(str){
     point = str.lastIndexOf("file=")+4;
@@ -32,7 +33,13 @@ $(function () {
             chart: {
                 renderTo: 'container',
                 zoomType: 'xy',
-                spacingRight: 20
+                spacingRight: 20,
+                resetZoomButton: {
+                    position: {
+                        align: 'left',
+                        verticalAlign: 'bottom',
+                    }
+                }
             },
     
             title: {
@@ -52,9 +59,10 @@ $(function () {
                 title: {
                     text: 'Temperature (Celcius)'
                 },
-                min: 0,
+                min: null,
                 startOnTick: false,
-                showFirstLabel: false
+                showFirstLabel: false,
+                max: null
             },
     
             legend: {
@@ -71,7 +79,7 @@ $(function () {
             plotOptions: {
                 series: {
                     cursor: 'pointer',
-                    lineWidth: 1.0,
+                    lineWidth: 1.0
                 }
             },
     

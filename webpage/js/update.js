@@ -5,6 +5,7 @@ var lower_thresh = 10.00;
 var chart_refresh_time = 180000; //3 minutes
 var live_table_refresh_time = 3000; //3 seconds
 var ip_refresh_time = 900000; //15 minutes
+var num_sensors = 2;
 function update_chart_table() {
     $.ajax({
         url: "http://30.30.30.90/json",
@@ -136,7 +137,13 @@ $(document).ready(function() {
         chart: {
             renderTo: 'container',
             zoomType: 'xy',
-            spacingRight: 20
+            spacingRight: 20,
+            resetZoomButton: {
+                position: {
+                    align: 'left',
+                    verticalAlign: 'bottom',
+                }
+            }
         },
 
         title: {
@@ -157,7 +164,7 @@ $(document).ready(function() {
             title: {
                 text: 'Temperature (Celcius)'
             },
-            min: 0,
+            min: null,
             startOnTick: false,
             showFirstLabel: false,
             max: null

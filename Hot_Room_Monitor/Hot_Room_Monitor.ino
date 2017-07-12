@@ -35,12 +35,11 @@
 #define UPPER_GAS_THRESH 400
 #define LOWER_GAS_THRESH 100
 #define MEASURE_INTERVAL_NORMAL 30000
-#define MEASURE_INTERVAL_EMERGENCY
+#define MEASURE_INTERVAL_EMERGENCY 5000
 #define DAYS_BETWEEN_NEW_LOG 1 //how often to make a new log
 #define ADDR_COUNT 1 //address for where day count will be stored in EEPROM
 #define ADDR_DAY 0 //address for where day number " "
-#define HIGH_FREQ 700
-#define LOW_FREQ 200
+#define NUM_SENSORS 2
 //<------------------------------------------------>
 
 
@@ -62,16 +61,21 @@ tmElements_t tm;
 unsigned long lastIntervalTime = 0;
 unsigned long lastResetTime = 0;
 long measure_interval = MEASURE_INTERVAL_NORMAL; //Time between measurements
+String str2log = "";
 //<------------------------------------------------>
 
 
 //<------------------SENSOR VARIABLES-------------->
-// Create the MCP9808 temperature sensor object
-Adafruit_MCP9808 tempsensor0 = Adafruit_MCP9808();
-Adafruit_MCP9808 tempsensor1 = Adafruit_MCP9808();
-
-bool *doors = (bool*) malloc (4 * sizeof(bool));
-float *temps = (float*) malloc (4* sizeof(float));
+// Create the MCP9808 temperature sensor object [UP TO 6 FOR NOW]
+//Adafruit_MCP9808 tempsensor0 = Adafruit_MCP9808();
+//Adafruit_MCP9808 tempsensor1 = Adafruit_MCP9808();
+//Adafruit_MCP9808 tempsensor2 = Adafruit_MCP9808();
+//Adafruit_MCP9808 tempsensor3 = Adafruit_MCP9808();
+//Adafruit_MCP9808 tempsensor4 = Adafruit_MCP9808();
+//Adafruit_MCP9808 tempsensor5 = Adafruit_MCP9808();
+Adafruit_MCP9808 *sensors = (Adafruit_MCP9808*)malloc(NUM_SENSORS*sizeof(Adafruit_MCP9808));
+int *sensor_addresses= (int*) malloc (NUM_SENSORS*sizeof(int));
+float *temps = (float*) malloc (NUM_SENSORS* sizeof(float));
 bool emergency_mode = false;
 //<------------------------------------------------>
 
@@ -92,13 +96,17 @@ void setup(){
 
   
   //Start Temperature Sensor
-  initialize_tempsensor();
+  initialize_tempsensor(sensors, sensor_addresses);
 
 
   RTC.read(tm);
   Serial.println("Today is " + twoDigitString(tm.Month) + "-" + twoDigitString(tm.Day) + "-" + (String) tmYearToCalendar(tm.Year));
-  getTemps(temps);
-  Serial.println("Initial Temperatures: " + (String) temps[0] + " " + (String) temps[1]);
+  getTemps(temps, sensors);
+  Serial.print("Initial Temperatures:");
+  for(int i = 0; i < NUM_SENSORS; i++){
+    Serial.print(" " + (String) temps[i]);
+  }
+  Serial.println("");
   //set filename upon restart
   file_name = "data/" + ((String)tmYearToCalendar(tm.Year)).substring(2) + "-" + twoDigitString(tm.Month) + "-" + twoDigitString(tm.Day) + ".CSV";
 }
@@ -133,18 +141,22 @@ void loop(){
       file_name = "data/" + ((String)tmYearToCalendar(tm.Year)).substring(2) + "-" + twoDigitString(tm.Month) + "-" + twoDigitString(tm.Day) + ".CSV";
     }
     
-    getTemps(temps);
-    sdLog(file_name, twoDigitString(tm.Month) + '-' + twoDigitString(tm.Day) + '-' + (String)tmYearToCalendar(tm.Year) +  ' ' + twoDigitString(tm.Hour) + ':' + twoDigitString(tm.Minute) + ':' + twoDigitString(tm.Second)
-    + ',' + temps[0] + ',' + temps[1]);
+    getTemps(temps, sensors);
+    str2log = twoDigitString(tm.Month) + '-' + twoDigitString(tm.Day) + '-' + (String)tmYearToCalendar(tm.Year) +  ' ' + twoDigitString(tm.Hour) + ':' + twoDigitString(tm.Minute) + ':' + twoDigitString(tm.Second);
+    for(int i = 0; i < NUM_SENSORS; i++){
+      str2log += (',' + (String) temps[i]); 
+    }
+    sdLog(file_name, str2log);
+    Serial.println("Writing: "+ str2log);
     //If any sensors are out of bounds, send turn on emergency mode
-    for (int n = 0; n < 2; n++){
+    for (int n = 0; n < NUM_SENSORS; n++){
       if (temps[n] > UPPER_TEMP_THRESH || temps[n] < LOWER_TEMP_THRESH){
         emergency_mode = true;
       }
     }
     if(emergency_mode){
       Serial.println("EMERGENCY MODE ACTIVATED; MEASUREMENT INTERVAL CHANGED TO 5 SECONDS");
-      measure_interval = 5000;
+      measure_interval = MEASURE_INTERVAL_EMERGENCY;
       emergency_mode = false;
      }else{
       measure_interval = MEASURE_INTERVAL_NORMAL;
@@ -199,8 +211,8 @@ void loop(){
           client.print(F("<head><title>Arduino Battery Lab Monitor</title></head><body>"));
           client.print(F("<h1>Arduino Battery Lab Monitor</h1>"));
           client.print(F("<table style=\"width:100%\"><tr><th>Temperature</th>"));
-          getTemps(temps); //Update Temperature readings
-          for (int i = 0; i < 2; i++){
+          getTemps(temps, sensors); //Update Temperature readings
+          for (int i = 0; i < NUM_SENSORS; i++){
             if (temps[i] > UPPER_TEMP_THRESH || temps[i] < LOWER_TEMP_THRESH){
               client.print(F("<td id=\"red\">"));
             } 
@@ -220,14 +232,14 @@ void loop(){
           client.println(F("Content-Type: application/json;charset=utf-8"));
 //          client.println(F("Connection: close"));
           client.println(F(""));
-          getTemps(temps);
+          getTemps(temps, sensors);
           RTC.read(tm);
           //formatting into json
           client.print("{");
           client.print("\"date\": ");
           client.print("\"" +twoDigitString(tm.Month) + '-' + twoDigitString(tm.Day) + '-' + (String)tmYearToCalendar(tm.Year) +  ' ' + twoDigitString(tm.Hour) + ':' + twoDigitString(tm.Minute) + ':' + twoDigitString(tm.Second)+"\"");
           client.print(",");
-          for(int i=0; i<2; i++){
+          for(int i = 0; i < NUM_SENSORS; i++){
             client.print("\"S");
             client.print(i);
             client.print("\": ");
@@ -296,14 +308,21 @@ void loop(){
 
 
 
-void initialize_tempsensor(){
+void initialize_tempsensor(Adafruit_MCP9808 *sensors, int *sensor_addresses){
   Serial.println("Initializing Temp Sensors");
-  if (!tempsensor0.begin(0x18)) {
-    Serial.println("Couldn't find Sensor 0");
+  for(int i = 0; i < NUM_SENSORS; i++){
+    sensor_addresses[i] = 24 + i;
+    sensors[i] = Adafruit_MCP9808();
+    if(!sensors[i].begin(sensor_addresses[i])){
+      Serial.println("Couldn't find Sensor " + (String) i);
+    }
   }
-  if (!tempsensor1.begin(0x19)) {
-    Serial.println("Couldn't find Sensor 1");
-  }
+//  if (!tempsensor0.begin(0x18)) {
+//    Serial.println("Couldn't find Sensor 0");
+//  }
+//  if (!tempsensor1.begin(0x19)) {
+//    Serial.println("Couldn't find Sensor 1");
+//  }
   Serial.println(F("Temperature Sensors Initialized"));
 }
 
@@ -432,10 +451,12 @@ void removeOldestLog(){
   Serial.println("Oldest Log Removed");
 }
 
-void getTemps(float *temps) {
-  temps[0] = tempsensor0.readTempC();
-  temps[1] = tempsensor1.readTempC();
-
+void getTemps(float *temps, Adafruit_MCP9808 *sensors) {
+  for(int i = 0; i < NUM_SENSORS; i++){
+    temps[i] = sensors[i].readTempC();
+  }
+//    temps[0] = tempsensor0.readTempC();
+//    temps[1] = tempsensor1.readTempC();
  }
 
 
