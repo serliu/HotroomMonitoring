@@ -5,6 +5,7 @@ var lower_thresh = 10.00;
 var chart_refresh_time = 180000; //3 minutes
 var live_table_refresh_time = 3000; //3 seconds
 var ip_refresh_time = 900000; //15 minutes
+var colors = ['#1F271B','#19647E','#28AFB0','#F4D35E','#EE964B']
 function update_chart_table() {
     $.ajax({
         url: "http://30.30.30.90/json",
@@ -31,12 +32,10 @@ function update_chart_table() {
                 if (chart.series.length == i){
                     chart.addSeries({
                         name: ('Sensor ' + i),
-                        data: [points[i]],
-                        marker: {
-                            radius: 2
-                        }
-                        
-                    })
+                        data: [],
+                        color: colors[Math.floor(Math.random()*5)],
+                        marker: {radius:3}
+                    });
                 }
                 chart.series[i].addPoint(points[i], true, false);
                 if (chart.series[i].data.length > 3360){
@@ -247,7 +246,7 @@ $(document).ready(function() {
         series: [{
             name: 'Sensor 0',
             marker: {
-                radius: 2
+                radius: 3
             },
             data: []
         },

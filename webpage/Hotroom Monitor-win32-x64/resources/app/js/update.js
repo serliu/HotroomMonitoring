@@ -5,34 +5,70 @@ var lower_thresh = 10.00;
 var chart_refresh_time = 180000; //3 minutes
 var live_table_refresh_time = 3000; //3 seconds
 var ip_refresh_time = 900000; //15 minutes
+var colors = ['#1F271B','#19647E','#28AFB0','#F4D35E','#EE964B']
 function update_chart_table() {
     $.ajax({
         url: "http://30.30.30.90/json",
         data: { tag: 'GetDataFromArduino'},
         dataType: "json",
-        timeout: 10000,
+        timeout: 3000,
         success: function(data){
-//            console.log(data.date, data.S0, data.S1);
-            var datetime = data.date; //"date time"
+            var points = [];
+            var c = 0;
+            var datetime = data.date;
             datetime = datetime.split(" "); //[date, time]
             var date = datetime[0].split("-");
             var time = datetime[1].split(":");
             datetime = Date.UTC(date[2], date[0] - 1, date[1], time[0], time[1], time[2]);
-            //console.log("UTC TIME: ", datetime);
-            var point0 = [datetime, data.S0];
-            var point1 = [datetime, data.S1];
-//            console.log(point0, point1);
-            var series0 = chart.series[0],
-                shift0 = series0.data.length > 500;
-            var series1 = chart.series[1],
-                shift1 = series1.data.length > 500;
-            chart.series[0].addPoint(point0, true, shift0);
-            chart.series[1].addPoint(point1, true, shift1);
-            if (chart.series[0].data.length > 3360){ //one week divided by 3 minutes
-                chart.series[0].removePoint(0, true);
-                chart.series[1].removePoint(0, true);
+//            console.log("UTC TIME: ", datetime);
+            delete data.date;
+//            console.log(data);
+            for(var x in data){
+                points[c] = [datetime, data[x]];
+                c++;
+//                console.log(points[c]);
+            } //c = NUM_SENSORS NOW
+            for(var i = 0; i < c; i++){
+                if (chart.series.length == i){
+                    chart.addSeries({
+                        name: ('Sensor ' + i),
+                        data: [],
+                        color: colors[Math.floor(Math.random()*5)],
+                        marker: {radius:3}
+                    });
+                }
+                chart.series[i].addPoint(points[i], true, false);
+                if (chart.series[i].data.length > 3360){
+                    chart.series[i].removePoint(0, true);
+                }
             }
             update_table();
+            
+            
+////            console.log(data.date, data.S0, data.S1);
+//            var datetime = data.date; //"date time"
+//            datetime = datetime.split(" "); //[date, time]
+//            var date = datetime[0].split("-");
+//            var time = datetime[1].split(":");
+//            datetime = Date.UTC(date[2], date[0] - 1, date[1], time[0], time[1], time[2]);
+//            //console.log("UTC TIME: ", datetime);
+//            
+//            
+//            
+//            var point0 = [datetime, data.S0];
+//            var point1 = [datetime, data.S1];
+////            console.log(point0, point1);
+//            var series0 = chart.series[0],
+//                shift0 = series0.data.length > 500;
+//            var series1 = chart.series[1],
+//                shift1 = series1.data.length > 500;
+//            chart.series[0].addPoint(point0, true, shift0);
+//            chart.series[1].addPoint(point1, true, shift1);
+//            if (chart.series[0].data.length > 3360){ //one week divided by 3 minutes
+//                chart.series[0].removePoint(0, true);
+//                chart.series[1].removePoint(0, true);
+//            }
+//            update_table();
         },
         cache: false
     })
@@ -42,14 +78,34 @@ function update_table() {
         url: "http://30.30.30.90/json",
         data: { tag: 'GetDataFromArduino'},
         dataType: "json",
-        timeout: 5000,
+        timeout: 3000,
         success: function(data){
-            document.getElementById('sensor0').innerHTML = data.S0 + '&deg;C';
-            document.getElementById('sensor1').innerHTML = data.S1 + '&deg;C';
-            if (data.S0 > upper_thresh) document.getElementById('sensor0').setAttribute('class','red');
-            else document.getElementById('sensor0').setAttribute('class','green');
-            if (data.S1 > upper_thresh) document.getElementById('sensor1').setAttribute('class','red');
-            else document.getElementById('sensor1').setAttribute('class','green');
+            delete data.date;
+            var live_table = '<table><tr>';
+            for(var i in data){
+                live_table += ('<th>Sensor ' + i[1] + '</th>');
+            }
+            live_table += '</tr><tr>';
+            for(var i in data){
+                if(data[i] > upper_thresh || data[i] < lower_thresh){
+                    live_table += '<td class=red>' + data[i] + '&deg;C</td>';
+                }
+                else{
+                    live_table += '<td class=green>' + data[i] + '&deg;C</td>';
+                }
+            }
+            live_table += '</tr></table>';
+            document.getElementById('live_temp_table').innerHTML = live_table;
+            
+            
+            
+            
+//            document.getElementById('sensor0').innerHTML = data.S0 + '&deg;C';
+//            document.getElementById('sensor1').innerHTML = data.S1 + '&deg;C';
+//            if (data.S0 > upper_thresh) document.getElementById('sensor0').setAttribute('class','red');
+//            else document.getElementById('sensor0').setAttribute('class','green');
+//            if (data.S1 > upper_thresh) document.getElementById('sensor1').setAttribute('class','red');
+//            else document.getElementById('sensor1').setAttribute('class','green');
         },
         cache: false
     })
@@ -136,7 +192,13 @@ $(document).ready(function() {
         chart: {
             renderTo: 'container',
             zoomType: 'xy',
-            spacingRight: 20
+            spacingRight: 20,
+            resetZoomButton: {
+                position: {
+                    align: 'left',
+                    verticalAlign: 'bottom',
+                }
+            }
         },
 
         title: {
@@ -157,7 +219,7 @@ $(document).ready(function() {
             title: {
                 text: 'Temperature (Celcius)'
             },
-            min: 0,
+            min: null,
             startOnTick: false,
             showFirstLabel: false,
             max: null
@@ -182,19 +244,13 @@ $(document).ready(function() {
         },
 
         series: [{
-            name: 'Sensor 1',
+            name: 'Sensor 0',
             marker: {
-                radius: 2
+                radius: 3
             },
             data: []
         },
-        {
-            name: 'Sensor 2',
-            marker: {
-                radius: 2
-            },
-            data: []
-        }]
+]
     };
 
     chart = new Highcharts.Chart(options);

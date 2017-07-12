@@ -21,7 +21,7 @@ function getDataFilename(str){
 }
 query  = window.location.search;
 var dataFilePath = "/data/"+getDataFilename(query);
-//var dataFilePath = getDataFilename(query);
+//var dataFilePath = "/data/17-07-12.CSV";
 $(function () {
     var chart;
     $(document).ready(function() {
@@ -84,16 +84,11 @@ $(function () {
             },
     
             series: [{
-                name: 'Sensor 1',
+                name: 'Sensor 0',
                 marker: {
                     radius: 2
-                }
-            },
-            {
-                name: 'Sensor 2',
-                marker: {
-                    radius: 2
-                }
+                },
+                data: []
             }
             ]
         };
@@ -103,6 +98,8 @@ $(function () {
         // to the options and initiate the chart.
         // This data is obtained by exporting a GA custom report to TSV.
         // http://api.jquery.com/jQuery.get/
+//        chart = new Highcharts.Chart(options);
+        
         jQuery.get(dataFilePath, null, function(csv, state, xhr) {
             var line = [],
                 datetimeline = [],
@@ -111,8 +108,9 @@ $(function () {
                 date,
     
                 // set up the 5 data series
-                temp0 = [],
-                temp1 = [];
+//                temp0 = [],
+//                temp1 = [];
+                temps = [[]];
     
             // inconsistency
             if (typeof csv !== 'string') {
@@ -131,12 +129,42 @@ $(function () {
                 //date = parseInt(line[0], 10)*1000;
                 //date = Date.parse(line[0] + " EST");
                 date = Date.UTC(dateline[2], dateline[0] - 1, dateline[1], timesline[0], timesline[1], timesline[2]);
-                temp0.push([date, parseFloat(line[1])]);
-                temp1.push([date, parseFloat(line[2])]);
+                line.shift();
+//                console.log(line);
+                for(var i = 0; i < (line.length); i++){
+                    if(options.series.length == i){ //make new series to match number of temperatures sent in
+                        console.log("series added");
+                        options.series.push({
+                        name: ('Sensor ' + i),
+                        data: [],
+                        marker: {
+                            radius: 2
+                        }
+                        });
+                    }
+                    console.log(parseFloat(line[i]));
+                    options.series[i].data.push([date, parseFloat(line[i])]);
+//                    chart.series[i].addPoint([date, parseFloat(line[i])],true, false);
+                }
+//                temp0.push([date, parseFloat(line[1])]);
+//                temp1.push([date, parseFloat(line[2])]);
 
             });
-            options.series[0].data = temp0;
-            options.series[1].data = temp1;
+//            for(var i = 0; i < line.length; i++){
+//                if (chart.series.length == i){
+//                    chart.series.addSeries({
+//                        name: ('Sensor ' + i),
+//                        data: [],
+//                        marker: {
+//                            radius: 2
+//                        }
+//                    })
+//                }
+//                chart.series[i].data = temps[i];
+//            }
+//            options.series[0].data = temp0;
+//            options.series[1].data = temp1;
+            
             chart = new Highcharts.Chart(options);
             
         });
