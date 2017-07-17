@@ -5,9 +5,9 @@ echo Start > pingloss.txt
 echo Start > badips.txt
 echo New Test %x% >> pinglossall.txt
 echo Failed IP----Date---------Time >> pinglossall.txt
-FOR /F %%i IN (C:\Users\Ejnar-2\Documents\Arduino\HotroomMonitoring\webpage\iplist.txt) DO CALL :firstpass %%i
+FOR /F %%i IN (%0\..\iplist.txt) DO CALL :firstpass %%i
 
-FOR /F "tokens=1 skip=1" %%h IN (C:\Users\Ejnar-2\Documents\Arduino\HotroomMonitoring\webpage\pingloss.txt) DO CALL :secondpass %%h  
+FOR /F "tokens=1 skip=1" %%h IN (%0\..\pingloss.txt) DO CALL :secondpass %%h  
 set /a x+=1
 timeout 900
 goto start

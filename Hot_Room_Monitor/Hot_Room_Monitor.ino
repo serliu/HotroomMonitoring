@@ -66,13 +66,6 @@ String str2log = "";
 
 
 //<------------------SENSOR VARIABLES-------------->
-// Create the MCP9808 temperature sensor object [UP TO 6 FOR NOW]
-//Adafruit_MCP9808 tempsensor0 = Adafruit_MCP9808();
-//Adafruit_MCP9808 tempsensor1 = Adafruit_MCP9808();
-//Adafruit_MCP9808 tempsensor2 = Adafruit_MCP9808();
-//Adafruit_MCP9808 tempsensor3 = Adafruit_MCP9808();
-//Adafruit_MCP9808 tempsensor4 = Adafruit_MCP9808();
-//Adafruit_MCP9808 tempsensor5 = Adafruit_MCP9808();
 Adafruit_MCP9808 *sensors = (Adafruit_MCP9808*)malloc(NUM_SENSORS*sizeof(Adafruit_MCP9808));
 int *sensor_addresses= (int*) malloc (NUM_SENSORS*sizeof(int));
 float *temps = (float*) malloc (NUM_SENSORS* sizeof(float));
@@ -255,8 +248,8 @@ void loop(){
           // send a standard http response header
           HtmlHeaderOK(client);
           client.println(F(""));
-          client.print(F("<!DOCTYPE html><style> body{font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif; color:#fff; height: 100%; background: #3498db; color #545454; margin: 0 auto; max-width: 100%; padding: 2em 2em 4em;} a:link{ text-decoration:none; font-weight: bold;color:#fff;}a:visited {text-decoration:none;font-weight:bold;color:#ddd;}a:hover{text-decoration:  underline;font-weight:bold;color:#fff;}"));
-          client.print(F("a:active{text-decoration:underline;font-weight:bold;color: white;}th{font-weight: bold;}th,td {padding: 3px;color: #fff;text-align: center;border: 1px solid #ddd;} table{color: #fff;border-collapse: collapse; border: 1px solid #ddd;width: 100%;table-layout: fixed;}</style><html><body>"));
+          client.print(F("<!DOCTYPE html><style> body{font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif; color:#FBFBFF; height: 100%; background: #01AADA; color #FBFBFF; margin: 0 auto; max-width: 100%; padding: 2em 2em 4em;} a:link{ text-decoration:none; font-weight: bold;color:#fff;}a:visited {text-decoration:none;font-weight:bold;color:#ddd;}a:hover{text-decoration:underline;font-weight:bold;color:#fff;}"));
+          client.print(F("a:active{text-decoration:underline;font-weight:bold;color: white;}th,td {padding: 7px;color: #FBFBFF;text-align: center;border: 1px solid #0B4F6C;} table{color: #FBFBFF; border-collapse: collapse; border: 1px solid #0B4F6C; width: 100%;table-layout: fixed;}</style><html><body>"));
           ListFiles(client);
           client.print(F("</body></html>"));
           
@@ -425,8 +418,7 @@ void ListFiles(EthernetClient client) {
       if (! entry) {
         break;
       }
-      filecount++;
-      if (filecount % 5 == 0){
+      if ((filecount % 5 == 0) && (filecount != 0)){
         client.print("</tr><tr>");
       }
       client.print("<td><a href=\"/HC.htm?file=");
@@ -435,6 +427,7 @@ void ListFiles(EthernetClient client) {
       client.print(entry.name());
       client.println("</a></td>");
       entry.close();
+      filecount++;
     }
   client.println("</tr></table>");
   //Serial.println("Number of files: " + (String) filecount);

@@ -6,8 +6,8 @@
         <script src="https://code.jquery.com/jquery-3.1.1.min.js"
 		integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
 		crossorigin="anonymous"></script>
-<!--        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
         <script type="text/javascript" src="http://code.highcharts.com/highcharts.js"></script>
+        <script src="http://code.highcharts.com/modules/exporting.js"></script> 
         <script type="text/javascript">
 function getDataFilename(str){
     point = str.lastIndexOf("file=")+4;
@@ -21,7 +21,7 @@ function getDataFilename(str){
 }
 query  = window.location.search;
 var dataFilePath = "/data/"+getDataFilename(query);
-//var dataFilePath = "/data/17-07-12.CSV";
+//var dataFilePath = "/data/17-07-12.CSV"; //for testing
 $(function () {
     var chart;
     $(document).ready(function() {
@@ -39,7 +39,9 @@ $(function () {
                         align: 'left',
                         verticalAlign: 'bottom',
                     }
-                }
+                },
+                borderRadius: 7,
+                backgroundColor: "#FBFBFF"
             },
     
             title: {
@@ -59,7 +61,7 @@ $(function () {
                 title: {
                     text: 'Temperature (Celcius)'
                 },
-                min: null,
+                min: 18,
                 startOnTick: false,
                 showFirstLabel: false,
                 max: null
@@ -90,7 +92,30 @@ $(function () {
                 },
                 data: []
             }
-            ]
+            ],
+            exporting:{
+                buttons: {
+                    returnButton: {
+                        align: 'left',
+                        x: 7,
+                        text: 'Return',
+                        onclick: function (){javascript:history.back();}
+                    },
+                    csvButton:{
+                        align: 'left',
+                        x: 70,
+                        text: 'Download CSV',
+                        onclick: function (){var file_path = dataFilePath;
+                            var a = document.createElement('A');
+                            a.href = file_path;
+                            a.download = file_path.substr(file_path.lastIndexOf('/') + 1);
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            }
+                    }
+                }
+            }
         };
     
     
@@ -133,7 +158,7 @@ $(function () {
 //                console.log(line);
                 for(var i = 0; i < (line.length); i++){
                     if(options.series.length == i){ //make new series to match number of temperatures sent in
-                        console.log("series added");
+//                        console.log("series added");
                         options.series.push({
                         name: ('Sensor ' + i),
                         data: [],
@@ -142,7 +167,7 @@ $(function () {
                         }
                         });
                     }
-                    console.log(parseFloat(line[i]));
+//                    console.log(parseFloat(line[i]));
                     options.series[i].data.push([date, parseFloat(line[i])]);
 //                    chart.series[i].addPoint([date, parseFloat(line[i])],true, false);
                 }
@@ -173,16 +198,35 @@ $(function () {
 });
         </script>
     </head>
-    <style> body{background: #3498db; overflow-x: hidden;} a{color: #fff; text-decoration: none; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: bold;} a:hover{color: #ddd; text-decoration: underline;}</style>
+    <style> body{
+        line-height: 2em;
+        background: #01AADA; overflow-x: hidden;
+        } 
+        a{
+            color: #FBFBFF; 
+            text-decoration: none; 
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; 
+            font-weight:bold;
+        } 
+        a:hover{
+            color: #ddd; 
+            text-decoration: underline;
+        }
+        ::-webkit-scrollbar { 
+            display: none; 
+        }
+        
+    </style>
     <body>
 
-        <div id="container" style="min-width: 400px; width: 100%; margin: 0 auto"></div>
+        <div id="container" style="min-width: 400px; width: 100%; height: 100%; margin: 0 auto"></div>
         
-         <center><a id="link1" href="" download>Click Here to Download this Log</a></center>
+<!--         <center><a id="link1" href="" download>Click Here to Download this Log</a></center>-->
+<!--
         <script>
             document.getElementById("link1").setAttribute("href", dataFilePath);
         </script>
-        <br/>
-        <center><a href="javascript:history.back()">[ Return ]</a></center>
+-->
+<!--        <center><a href="javascript:history.back()">[ Return ]</a></center>-->
     </body>
 </html>

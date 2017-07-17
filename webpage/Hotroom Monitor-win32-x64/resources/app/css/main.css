@@ -1,33 +1,59 @@
-@import url('https://fonts.googleapis.com/css?family=Audiowide');
-html{
-    height:100%;
+/*@import url('https://fonts.googleapis.com/css?family=Roboto|Bungee');*/
+@font-face {
+    font-family: Bungee;
+    src: local("Bungee"),
+        url('fonts/Bungee/Bungee-Regular.ttf');
+}
+@font-face {
+    font-family: Roboto;
+    src: local("Roboto"),
+        url('fonts/Roboto/Roboto-Regular.ttf');
+}
+@font-face {
+    font-family: Audiowide;
+    src: local("Audiowide"),
+        url('fonts/Audiowide/Audiowide-Regular.ttf');
 }
 .green{
-    background: limegreen;
+    background: #1EB24F;
 }
 .red{
-    background: red;
+    background: #FF4136;
 }
 th{
-    font-weight: bold;
-}
-th,td {
-    padding: 3px;
+    background-color: #0B4F6C;
+    padding: 5px;
     color: #fff; 
     text-align: center;
-    border: 0px none;
+    font-weight: 300;
+}
+td {
+    padding: 0.3em 0.3em;
+    color: #fff; 
+    text-align: center;
+/*    font-family: 'Roboto'*/
+/*    border: 0px none;*/
+/*    border: 1px solid #757575;*/
 } 
 table{
     color: #fff;
-    border: 1px solid #ddd;
-    border-collapse: collapse;
+    border: 3px solid #0B4F6C;
+/*    border-collapse: collapse;*/
+    border-spacing: 0px;
     width: 100%;
     table-layout: fixed;
+/*    background-color: #3498db;*/
+    font-family: "Roboto";
+    border-radius: 2px;
 }
 h1 {
     font-family: 'Audiowide';
-      font-size: 42px;
-      color: #fff;
+    font-weight: normal;
+    font-size: 42px;
+    color: #fff;
+    color: #FBFBFF;
+    margin: 0;
+    margin-top: -1%;
 } 
 h2{
     color: #fff;
@@ -39,9 +65,9 @@ h2{
 }
 a{
   /* Applies to all unvisited links */
-  text-decoration:  none;
-  font-weight:      bold;
-  color:            #fff;
+    text-decoration:  none;
+    font-family: "Roboto";
+    color:            #fff;
 }
 a:hover{
     color: #ddd;
@@ -55,16 +81,16 @@ ul{
 }
 iframe{
     width: 100%;
-    height: 400px;
+    height: 411px;
     border: none;
     overflow: hidden;
 }
 body {
     color: #fff; 
-    height: 100%;
-    background: #3498db; 
+    height: inherit;
+    background: #01AADA;  /* fallback for old browsers */
+/*    background: #114B5F; */
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.06);
-    color: #545454; 
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     text-align: center;
     line-height: 1.5;
@@ -82,22 +108,24 @@ li {
     font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;
 } 
 #s_button{
-    background: none;
-    padding: 5px 10px 6px;
-    color: #fff;
-    text-decoration: none;
-    font-weight: bold;
-    line-height: 1;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    -moz-box-shadow: 0 1px 3px #999;
-    -webkit-box-shadow: 0 1px 3px #999;
-    border-bottom: 1px solid #222;
+    width: 10em;
+    border: none;
+    border-radius:3px;
+    margin: auto;
+    padding: 11px 0px;
+    text-align:center;
+    font-family: 'Roboto';
+    font-weight: 300;
+    font-size: 15px;
+    color: #ecf0f1;
+    box-shadow: 3px 4px 10px #757575;
+    background: #fff;
+/*    text-shadow: -1px 0 #757575, 0 1px #757575, 1px 0 #757575, 0 -1px #757575;*/
+
+}
+#s_button:active{
     position: relative;
-    cursor: pointer;
-    -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
-    border-bottom: 1px solid rgba(0,0,0,0.25);
-    background-color: #e33100;
+    top: 3px;
+/*    box-shadow: 0px 0px #c0392b;*/
+    background: #FF4136;
 }

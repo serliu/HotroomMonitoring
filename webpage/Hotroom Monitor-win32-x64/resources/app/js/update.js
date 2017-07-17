@@ -5,7 +5,8 @@ var lower_thresh = 10.00;
 var chart_refresh_time = 180000; //3 minutes
 var live_table_refresh_time = 3000; //3 seconds
 var ip_refresh_time = 900000; //15 minutes
-var colors = ['#1F271B','#19647E','#28AFB0','#F4D35E','#EE964B']
+var colors =['#1F271B','#19647E','#28AFB0','#F4D35E','#EE964B','#1EB24F','#0B4F6C','#01BAEF','#757575']
+var day = 0;
 function update_chart_table() {
     $.ajax({
         url: "http://30.30.30.90/json",
@@ -20,6 +21,12 @@ function update_chart_table() {
             var date = datetime[0].split("-");
             var time = datetime[1].split(":");
             datetime = Date.UTC(date[2], date[0] - 1, date[1], time[0], time[1], time[2]);
+            if(day == 0){
+                day = date[1];
+            }
+            if(date[1] != day){
+                refresh_iframe();
+            }
 //            console.log("UTC TIME: ", datetime);
             delete data.date;
 //            console.log(data);
@@ -34,7 +41,9 @@ function update_chart_table() {
                         name: ('Sensor ' + i),
                         data: [],
                         color: colors[Math.floor(Math.random()*5)],
-                        marker: {radius:3}
+                        marker: {
+                            enabled: true,
+                            radius:1}
                     });
                 }
                 chart.series[i].addPoint(points[i], true, false);
@@ -43,36 +52,18 @@ function update_chart_table() {
                 }
             }
             update_table();
-            
-            
-////            console.log(data.date, data.S0, data.S1);
-//            var datetime = data.date; //"date time"
-//            datetime = datetime.split(" "); //[date, time]
-//            var date = datetime[0].split("-");
-//            var time = datetime[1].split(":");
-//            datetime = Date.UTC(date[2], date[0] - 1, date[1], time[0], time[1], time[2]);
-//            //console.log("UTC TIME: ", datetime);
-//            
-//            
-//            
-//            var point0 = [datetime, data.S0];
-//            var point1 = [datetime, data.S1];
-////            console.log(point0, point1);
-//            var series0 = chart.series[0],
-//                shift0 = series0.data.length > 500;
-//            var series1 = chart.series[1],
-//                shift1 = series1.data.length > 500;
-//            chart.series[0].addPoint(point0, true, shift0);
-//            chart.series[1].addPoint(point1, true, shift1);
-//            if (chart.series[0].data.length > 3360){ //one week divided by 3 minutes
-//                chart.series[0].removePoint(0, true);
-//                chart.series[1].removePoint(0, true);
-//            }
-//            update_table();
+
         },
         cache: false
     })
 };
+
+function refresh_iframe(){
+    var ifr=document.getElementsByName('arduino_history')[0];
+    ifr.src=ifr.src;
+}
+
+
 function update_table() {
     $.ajax({
         url: "http://30.30.30.90/json",
@@ -129,11 +120,11 @@ function display_iplist(){
     //BAD IP TXT FILE NEEDS NEW LINE AT THE END OR LAST ONE WILL NOT WORK CORRECTLY
     //console.log(all_ips, bad_ips);
 //    console.log(all_ips)
-    var iptable = "<table><tr>";
+    var iptable = "<table><tr><th colspan=\"4\">IP Addresses</th></tr><tr>";
     var isbad = false;
-    for (var i = 0; i < all_ips.length; i++){
-
-        if ( i % 4 == 0){
+    
+    for (var i = 0; i < all_ips.length - 1; i++){
+        if ( i % 4 == 0 && i != 0){
             iptable += "</tr><tr>";
         }
         for (var j = 0; j < bad_ips.length; j++){
@@ -143,22 +134,41 @@ function display_iplist(){
                 break;
             }
         }
-        if(isbad){
+        
+        if (all_ips[i].length == 0){
+            iptable += "<td>" + all_ips[i]+ "</td>";
+        }
+        else if(isbad){
             iptable += "<td class=\"red\">" + all_ips[i]+ "</td>";
-        } else{
+        } 
+//        else if (all_ips[i].length == 0){
+//            iptable += "<td>" + all_ips[i]+ "</td>";
+//        }
+        else{
             iptable += "<td class=\"green\">" + all_ips[i]+ "</td>";
         }
         isbad = false;
     }
-    iptable += "</tr><table>"
+    
+    
+//    var c = all_ips.length;
+//    console.log(c%4);
+//    if(c%4 > 0){
+//        while((c % 4) != 0){
+//            iptable+= "<td></td>";
+//            c++;
+//        }
+//    }
+    iptable += "</tr></table>"
     //console.log(iptable);
+    document.get
     document.getElementById('iptable').innerHTML = iptable;
 }
             
             
 function start_running(){
     document.getElementById("s_button").innerHTML = "Stop Updating";
-    document.getElementById("s_button").style.backgroundColor = "#e33100";
+    document.getElementById("s_button").style.backgroundColor = "#FF4136";
     document.getElementById("s_button").setAttribute('onClick', 'stop_running();');
     update_chart_table();
     display_iplist();
@@ -178,7 +188,7 @@ function stop_running(){
     clearInterval(table_interval);
     clearInterval(ip_interval);
     document.getElementById("s_button").innerHTML = "Resume Updating";
-    document.getElementById("s_button").style.backgroundColor = "blue";
+    document.getElementById("s_button").style.backgroundColor = "#1EB24F";
     document.getElementById("s_button").setAttribute('onClick', 'start_running();')
     
 }
@@ -198,7 +208,13 @@ $(document).ready(function() {
                     align: 'left',
                     verticalAlign: 'bottom',
                 }
-            }
+            },
+//            borderWidth: 3,
+//            borderColor: '#0B4F6C',
+            borderRadius: 7,
+            backgroundColor: '#FBFBFF'
+            
+            
         },
 
         title: {
@@ -219,7 +235,7 @@ $(document).ready(function() {
             title: {
                 text: 'Temperature (Celcius)'
             },
-            min: null,
+            min: 18,
             startOnTick: false,
             showFirstLabel: false,
             max: null
@@ -246,7 +262,8 @@ $(document).ready(function() {
         series: [{
             name: 'Sensor 0',
             marker: {
-                radius: 3
+                enabled: true,
+                radius: 1
             },
             data: []
         },

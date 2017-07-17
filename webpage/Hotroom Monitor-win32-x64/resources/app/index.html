@@ -9,28 +9,19 @@
         <script type="text/javascript" src="js/jquery-3.2.1.min.js"></script>
         <script type="text/javascript" src="js/update.js"></script>
         <script type="text/javascript" src ="js/highcharts.js"></script>
+        <script type="text/javascript" src ="js/exporting.js"></script>
         <script>if (window.module) module = window.module;</script>
     </head>
     
     
     <body>
-        <h1>Hot Room Monitor <span id="coops">by co-ops</span></h1>
+        <h1>HotRoom Monitor <span id="coops">by co-ops</span></h1>
         <div id="live_temp_table"></div>
-<!--
+        <br/>
         <table>
             <tr>
-                <th>Sensor 1:</th>
-                <td id="sensor0"></td>
-                <th>Sensor 2:</th>
-                <td id="sensor1"></td>
-            </tr>
-        </table>
--->
-        <br/>
-        <table style="padding: 0px;">
-            <tr>
                 <th>Live Temperature</th>
-                <th><a href="#" onclick="var ifr=document.getElementsByName('arduino_history')[0]; ifr.src=ifr.src;" >Temperature Logs ↺</a></th>
+                <th><a href="#" onclick="refresh_iframe()" >Temperature Logs ↺</a></th>
             </tr>
             <tr>
                 <td>
@@ -46,7 +37,12 @@
         <br />
         <div id="iptable"></div>
         <br />
-        <button id="s_button" onclick="stop_running();">Stop Updating</button>
+        <div syle="width: 100%;">
+            <div style="margin: auto; text-align:center" id="button-div">
+                <button id="s_button" onclick="stop_running();">Stop Updating</button>
+            </div>
+        </div>
+        
         
     </body>
 </html>
