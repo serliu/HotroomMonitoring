@@ -1,6 +1,6 @@
 var chart;
 var chart_interval, table_interval, ip_interval;
-var upper_thresh = 50.00;
+var upper_thresh = 38.00;
 var lower_thresh = 10.00;
 var chart_refresh_time = 180000; //3 minutes
 var live_table_refresh_time = 3000; //3 seconds
@@ -9,7 +9,7 @@ var colors =['#1F271B','#19647E','#28AFB0','#F4D35E','#EE964B','#1EB24F','#0B4F6
 var day = 0;
 function update_chart_table() {
     $.ajax({
-        url: "http://30.30.30.90/json",
+        url: "http://192.168.100.100/json",
         data: { tag: 'GetDataFromArduino'},
         dataType: "json",
         timeout: 3000,
@@ -66,7 +66,7 @@ function refresh_iframe(){
 
 function update_table() {
     $.ajax({
-        url: "http://30.30.30.90/json",
+        url: "http://192.168.100.100/json",
         data: { tag: 'GetDataFromArduino'},
         dataType: "json",
         timeout: 3000,

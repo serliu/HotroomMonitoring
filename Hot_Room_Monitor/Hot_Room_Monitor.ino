@@ -30,10 +30,8 @@
 
 
 //<-------------STATIC DEFINIITONS----------------->
-#define UPPER_TEMP_THRESH 28
-#define LOWER_TEMP_THRESH 18
-#define UPPER_GAS_THRESH 400
-#define LOWER_GAS_THRESH 100
+#define UPPER_TEMP_THRESH 38
+#define LOWER_TEMP_THRESH 10
 #define MEASURE_INTERVAL_NORMAL 30000
 #define MEASURE_INTERVAL_EMERGENCY 5000
 #define DAYS_BETWEEN_NEW_LOG 1 //how often to make a new log
@@ -45,9 +43,9 @@
 
 //<-----------------IP SETTINGS-------------------->
 byte mac[] = { 0x8A, 0x7F, 0xA7, 0x2F, 0x8D, 0xE0 };  
-IPAddress ip(30,30,30,90);
-IPAddress gateway(30,30,30,254);
-IPAddress subnet(255, 255, 255, 0);
+IPAddress ip(192,168,100,100);
+IPAddress gateway(192,160,0,254);
+IPAddress subnet(255, 255, 0, 0);
 EthernetServer server(80);
 int port = 80; //only open port on this network
 EthernetClient client;
@@ -62,6 +60,7 @@ unsigned long lastIntervalTime = 0;
 unsigned long lastResetTime = 0;
 long measure_interval = MEASURE_INTERVAL_NORMAL; //Time between measurements
 String str2log = "";
+char timestamp[30];
 //<------------------------------------------------>
 
 
@@ -81,19 +80,23 @@ void setup(){
   
   //Start SD card
   initialize_sd();
-  //sdRWTest(); //Uncomment to test SD card Read/Write
-
+//  sdRWTest(); //Uncomment to test SD card Read/Write
+  
+  //Start Temperature Sensor
+  initialize_tempsensor(sensors, sensor_addresses);
   
   //Start Ethernet Connection
   initialize_ethernet();
 
-  
-  //Start Temperature Sensor
-  initialize_tempsensor(sensors, sensor_addresses);
 
 
   RTC.read(tm);
-  Serial.println("Today is " + twoDigitString(tm.Month) + "-" + twoDigitString(tm.Day) + "-" + (String) tmYearToCalendar(tm.Year));
+  SdFile::dateTimeCallback(dateTime);
+//  Serial.println("Today is " + twoDigitString(tm.Month) + "-" + twoDigitString(tm.Day) + "-" + (String) tmYearToCalendar(tm.Year));  Serial.println(timestamp);
+  sprintf(timestamp, "%02d:%02d:%02d %2d/%2d/%2d \n", tm.Hour,tm.Minute,tm.Second,tm.Month,tm.Day,tm.Year+1970);
+  Serial.println(timestamp);
+
+  
   getTemps(temps, sensors);
   Serial.print("Initial Temperatures:");
   for(int i = 0; i < NUM_SENSORS; i++){
@@ -308,6 +311,8 @@ void initialize_tempsensor(Adafruit_MCP9808 *sensors, int *sensor_addresses){
     sensors[i] = Adafruit_MCP9808();
     if(!sensors[i].begin(sensor_addresses[i])){
       Serial.println("Couldn't find Sensor " + (String) i);
+    } else{
+      Serial.println("Sensor: " + (String) i + " Initialized");
     }
   }
 //  if (!tempsensor0.begin(0x18)) {
@@ -331,6 +336,18 @@ void initialize_ethernet()
   server.begin();
   Serial.println(Ethernet.localIP());
 }
+
+// call back for file timestamps
+void dateTime(uint16_t* date, uint16_t* time) {
+  RTC.read(tm);
+  sprintf(timestamp, "%02d:%02d:%02d %2d/%2d/%2d \n", tm.Hour,tm.Minute,tm.Second,tm.Month,tm.Day,tm.Year +1970);
+  Serial.println(timestamp);
+  // return date using FAT_DATE macro to format fields
+  *date = FAT_DATE(tm.Year+1970, tm.Month, tm.Day);
+  // return time using FAT_TIME macro to format fields
+  *time = FAT_TIME(tm.Hour, tm.Minute, tm.Second);
+}
+
 
 
 //Sets up SD card
@@ -359,6 +376,7 @@ void sdRWTest(void){
 
   // open a new file and immediately close it:
   Serial.println("Creating example.txt...");
+  SdFile::dateTimeCallback(dateTime);
   myFile = SD.open("example.txt", FILE_WRITE);
   myFile.close();
 
@@ -384,6 +402,7 @@ void sdRWTest(void){
 //Inputs char array pointer to file name on sd and
 //String of what to append to that file;
 void sdLog(String fileName, String stringToWrite) {
+  SdFile::dateTimeCallback(dateTime);
   File myFile = SD.open(fileName, FILE_WRITE);
   // if the file opened okay, write to it:
   if (myFile) {

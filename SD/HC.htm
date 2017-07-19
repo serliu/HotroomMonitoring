@@ -3,11 +3,22 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <title>Arduino Data History!</title>        
+<!--
         <script src="https://code.jquery.com/jquery-3.1.1.min.js"
 		integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
 		crossorigin="anonymous"></script>
         <script type="text/javascript" src="http://code.highcharts.com/highcharts.js"></script>
         <script src="http://code.highcharts.com/modules/exporting.js"></script> 
+-->
+        
+<!--
+        <script type="text/javascript" src="\\HOTROOMSERVER\Share\ARDUINO\js\jquery-3.2.1.min.js"></script>
+        <script type="text/javascript" src ="\\HOTROOMSERVER\Share\ARDUINO\js\highcharts.js"></script>
+        <script type="text/javascript" src ="\\HOTROOMSERVER\Share\ARDUINO\js\exporting.js"></script>
+-->
+        <script type="text/javascript" src="http://192.168.0.1:8080/ARDUINO/js/jquery-3.2.1.min.js"></script>
+        <script type="text/javascript" src ="http://192.168.0.1:8080/ARDUINO/js/highcharts.js"></script>
+        <script type="text/javascript" src ="http://192.168.0.1:8080/ARDUINO/js/exporting.js"></script>
         <script type="text/javascript">
 function getDataFilename(str){
     point = str.lastIndexOf("file=")+4;
@@ -61,7 +72,7 @@ $(function () {
                 title: {
                     text: 'Temperature (Celcius)'
                 },
-                min: 18,
+                min: null,
                 startOnTick: false,
                 showFirstLabel: false,
                 max: null
