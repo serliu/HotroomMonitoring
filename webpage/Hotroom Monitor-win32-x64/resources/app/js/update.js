@@ -3,8 +3,8 @@ var chart_interval, table_interval, ip_interval;
 var upper_thresh = 38.00;
 var lower_thresh = 10.00;
 var chart_refresh_time = 180000; //3 minutes
-var live_table_refresh_time = 3000; //3 seconds
-var ip_refresh_time = 900000; //15 minutes
+var live_table_refresh_time = 5000; //3 seconds
+var ip_refresh_time = 300000; //15 minutes
 var colors =['#1F271B','#19647E','#28AFB0','#F4D35E','#EE964B','#1EB24F','#0B4F6C','#01BAEF','#757575']
 var day = 0;
 function update_chart_table() {
@@ -120,11 +120,11 @@ function display_iplist(){
     //BAD IP TXT FILE NEEDS NEW LINE AT THE END OR LAST ONE WILL NOT WORK CORRECTLY
     //console.log(all_ips, bad_ips);
 //    console.log(all_ips)
-    var iptable = "<table><tr><th colspan=\"4\">IP Addresses</th></tr><tr>";
+    var iptable = "<table><tr><th colspan=\"12\">IP Addresses</th></tr><tr>";
     var isbad = false;
     
     for (var i = 0; i < all_ips.length - 1; i++){
-        if ( i % 4 == 0 && i != 0){
+        if ( i % 12 == 0 && i != 0){
             iptable += "</tr><tr>";
         }
         for (var j = 0; j < bad_ips.length; j++){

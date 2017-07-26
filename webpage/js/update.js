@@ -3,8 +3,8 @@ var chart_interval, table_interval, ip_interval;
 var upper_thresh = 38.00;
 var lower_thresh = 10.00;
 var chart_refresh_time = 180000; //3 minutes
-var live_table_refresh_time = 3000; //3 seconds
-var ip_refresh_time = 900000; //15 minutes
+var live_table_refresh_time = 5000; //3 seconds
+var ip_refresh_time = 300000; //15 minutes
 var colors =['#1F271B','#19647E','#28AFB0','#F4D35E','#EE964B','#1EB24F','#0B4F6C','#01BAEF','#757575']
 var day = 0;
 function update_chart_table() {
