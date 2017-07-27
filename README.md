@@ -22,7 +22,7 @@ The applicaiton sends requests to an arduino with temperature sensors attached w
 # Installation
 ## Arduino Assembly
 The temperature sensors can be chained together along with the Chronodot which all use SDL/SDA ports on the arduino. Make sure to pull the teperature to high as shown in the picture below.
-![Picture of Arduino](/Arduino\ Layout.jpg "")
+![Picture of Arduino](/ArduinoLayout.jpg "")
 
 ## Arduino Calibration & Setup
 1. Calibrate the chronodot by using the DS1207RTC libary example sketches. Set the time with the SetTime sketch and verify it is working using the ReadTest sketch.
