@@ -240,7 +240,7 @@ void loop(){
             client.print(i);
             client.print("\": ");
             client.print(temps[i]);
-            if( i!=1 ){
+            if( i!= (NUM_SENSORS-1) ){
               client.print(",");
             }
           }
