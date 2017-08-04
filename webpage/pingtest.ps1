@@ -1,5 +1,5 @@
 ﻿while($true){
-    Write-Host "Running..."
+    Write-Host Running...
     $ip_list = @()
     $ip_list_final = @()
     Get-Content  'iplist.txt' | %{
@@ -29,8 +29,8 @@
 
     Write-Host "Ping Test Completed"
     $a = Get-Date
-        Write-Host $a, "Sleeping for 15 minutes"
-        Start-Sleep -Seconds 900
+        Write-Host $a
+        cmd /c timeout 180
 }
 
 Write-Host "Timed out, restart"
